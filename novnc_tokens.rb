@@ -57,7 +57,7 @@ end
 
 begin
 	url = "#{host}/admin/enterprises?limit=0"
-	entxml = RestClient::Request.new(:method => :get, :url => url, :user => user, :password => pass).execute
+	entxml = RestClient::Request.new(:method => :get, :url => url, :user => user, :password => pass, :headers => { 'Accept' => 'application/vnd.abiquo.enterprises+xml' }).execute
 	Nokogiri::XML.parse(entxml).xpath('//enterprises/enterprise').each do |ent|
 		ent.xpath('./link[@rel="virtualmachines"]').each do |entvm|
 			url = entvm.attribute("href").to_s
