@@ -206,9 +206,12 @@
             if (token) {
                 WebUtil.createCookie('token', token, 1)
             }
+            token = md5(WebUtil.getQueryVar('vncIP', window.location.hostname) + ":" + WebUtil.getQueryVar('vncPort', window.location.port));
+
 
             password = WebUtil.getQueryVar('password', '');
             path = WebUtil.getQueryVar('path', 'websockify');
+
 
             if ((!host) || (!port)) {
                 updateState('failed',
