@@ -50,7 +50,7 @@
                     <td><div id="noVNC_status" style="position: relative; height: auto;">
                         Loading
                     </div></td>
-                    <td width="1%"><div id="noVNC_buttons">
+                    <td width="10%"><div id="noVNC_buttons">
                         <input type=button value="Send CtrlAltDel"
                             id="sendCtrlAltDelButton">
                         <span id="noVNC_xvp_buttons">
@@ -228,7 +228,7 @@
                            'onXvpInit':    xvpInit,
                            'onPasswordRequired':  passwordRequired,
                            'onFBUComplete': FBUComplete});
-            rfb.connect(host, port, password, path);
+            rfb.connect(host, port, password, path + "?token=" + token);
         };
         </script>
 
