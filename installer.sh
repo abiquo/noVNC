@@ -29,7 +29,7 @@ EOF
 download_websockify () {
   # Download websockify
   destdir=$(mktemp -d)
-  wget http://github.com/kanaka/noVNC/tarball/master \
+  wget http://github.com/kanaka/noVNC/tarball/v0.5.1 \
     -O $destdir/novnc-master.tar.gz
   cd $destdir
   tar xf novnc-master.tar.gz
@@ -104,7 +104,7 @@ setup_ui () {
 
   # Download websockify
   destdir=$(mktemp -d)
-  wget http://github.com/kanaka/noVNC/tarball/master \
+  wget http://github.com/kanaka/noVNC/tarball/v0.5.1 \
     -O $destdir/novnc-master.tar.gz
   cd $destdir
   tar xf novnc-master.tar.gz
