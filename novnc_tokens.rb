@@ -2,12 +2,12 @@
 begin
 	require 'rubygems'
 	require 'rest_client'
-	require 'nokogiri'
+	require 'json'
 	require 'getoptlong'
 	require 'digest/md5'
 rescue LoadError
 	puts "Some dependencies are missing.
-	Check for availabilty of rubygems, rest-client, nokogiri, getoptlong, digest/md5.
+	Check for availabilty of rubygems, rest-client, json, getoptlong, digest/md5.
 	Try again once dependencies are met.
 
 "
@@ -57,19 +57,18 @@ end
 
 begin
 	url = "#{host}/admin/enterprises?limit=0"
-	entxml = RestClient::Request.new(:method => :get, :url => url, :user => user, :password => pass).execute
-	Nokogiri::XML.parse(entxml).xpath('//enterprises/enterprise').each do |ent|
-		ent.xpath('./link[@rel="virtualmachines"]').each do |entvm|
-			url = entvm.attribute("href").to_s
-			vmxml = RestClient::Request.new(:method => :get, :url => "#{url}?limit=0", :user => user, :password => pass, :headers => {'Accept' => 'application/vnd.abiquo.virtualmachines+xml'}).execute
-			Nokogiri::XML.parse(vmxml).xpath('//virtualMachines/virtualMachine').each do |vm|
-				unless vm.at('vdrpIP').nil? or vm.at('vdrpPort').nil?
-					conn = "#{vm.at('vdrpIP').to_str}:#{vm.at('vdrpPort').to_str}"
-					digest = Digest::MD5.hexdigest(conn)
-					line = "#{digest}: #{conn}"
-					puts "#{line}"
-				end
-			end
+	entjson = RestClient::Request.new(:method => :get, :url => url, :user => user, :password => pass).execute
+	enterprises = JSON.parse(entjson)['collection']
+	enterprises.each do |ent|
+		vm_url = ent['links'].select {|l| l['rel'].eql? "virtualmachines" }.first['href']
+		vmjson = RestClient::Request.new(:method => :get, :url => "#{vm_url}?limit=0", :user => user, :password => pass, :headers => {'Accept' => 'application/vnd.abiquo.virtualmachines+json'}).execute
+		vms = JSON.parse(vmjson)['collection']
+
+		vms.each do |vm|
+			conn = "#{vm['vdrpIP']}:#{vm['vdrpPort']}"
+			digest = Digest::MD5.hexdigest(conn)
+			line = "#{digest}: #{conn}"
+			puts "#{line}"
 		end
 	end
 rescue SocketError
