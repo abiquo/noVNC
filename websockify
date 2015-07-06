@@ -18,7 +18,7 @@
 
 BINDIR=/opt/websockify
 VARDIR=/var/websockify
-WEBSOCKIFY=$BINDIR/websockify
+WEBSOCKIFY=$BINDIR/run
 WEBSOCKIFY_PORT=41337
 PIDFILE=/var/run/websockify.pid
 TOKEN_FILE=$BINDIR/config.vnc
@@ -29,10 +29,10 @@ case "$1" in
   start)
 	[ -x $WEBSOCKIFY ] || exit 1
 	echo -n $"Starting websockify server: "
-	daemon --user "$USER" --pidfile $PIDFILE python "$WEBSOCKIFY" -D "$WEBSOCKIFY_PORT" --target-config="$TOKEN_FILE"
+        daemon --user "$USER" --pidfile $PIDFILE python "$WEBSOCKIFY" -D "$WEBSOCKIFY_PORT" --token-plugin TokenFile --token-source="$TOKEN_FILE"
 	RETVAL=$?
 	echo
-	[ $RETVAL -eq 0 ] && sleep 1 && ps aux | grep [/]opt/websockify/websockify | awk '{print $2}' > $PIDFILE
+	[ $RETVAL -eq 0 ] && sleep 1 && ps aux | grep [/]opt/websockify/run | awk '{print $2}' > $PIDFILE
 	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/websockify
 	;;
   stop)
