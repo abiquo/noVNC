@@ -88,7 +88,7 @@ install_proxy () {
   # Set up cron for tokens.
   cat << EOF > /etc/cron.d/novnc_tokens
 # VNC Proxy (set to run every minute in the example)
-* * * * * root /opt/websockify/novnc_tokens.rb -a ${ABIQUO_API_URL} -u ${ABIQUO_API_USER} -p ${ABIQUO_API_PASS} > /opt/websockify/config.vnc
+* * * * * root /opt/websockify/novnc_tokens.rb -a ${ABIQUO_API_URL} -u ${ABIQUO_API_USER} -p ${ABIQUO_API_PASS} -f /opt/websockify/config.vnc
 EOF
 
   service websockify start
