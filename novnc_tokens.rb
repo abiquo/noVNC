@@ -79,6 +79,7 @@ begin
 			end
 		end
 	end
+	tmp_file.close
 	FileUtils.mv tmp_file.path, conf_file, :force => true
 rescue SocketError
 	puts "Cannot connect to specified host."
