@@ -26,16 +26,6 @@ cat << EOF
 EOF
 }
 
-download_websockify () {
-  # Download websockify
-  destdir=$(mktemp -d)
-  wget http://github.com/kanaka/noVNC/tarball/v0.5.1 \
-    -O $destdir/novnc-master.tar.gz
-  cd $destdir
-  tar xf novnc-master.tar.gz
-  mv kanaka-noVNC-* $1
-}
-
 install_proxy () {
   proxy_port=${1:-41337}
 
@@ -53,27 +43,27 @@ install_proxy () {
 
   # Download websockify
   destdir=$(mktemp -d)
-  wget http://github.com/kanaka/websockify/tarball/master \
-    -O $destdir/websockify-master.tar.gz
-  cd $destdir
-  tar xf websockify-master.tar.gz
-  mv kanaka-websockify-* /opt/websockify
+  wget https://github.com/kanaka/websockify/archive/v0.7.0.tar.gz \
+    -O "$destdir/novnc-0.7.0.tar.gz"
+  cd "$destdir"
+  tar xf novnc-0.7.0.tar.gz
+  mv kanaka-noVNC-* /opt/websockify
 
   # Websockify service autostart
   if [ -z "$PROXY_CERT" ]; then
-    wget https://raw.githubusercontent.com/abiquo/noVNC/master/websockify \
+    wget https://raw.githubusercontent.com/abiquo/noVNC/0.0.1/websockify \
       -O /etc/init.d/websockify
   else
-    wget https://raw.githubusercontent.com/abiquo/noVNC/master/websockify-ssl \
+    wget https://raw.githubusercontent.com/abiquo/noVNC/0.0.1/websockify-ssl \
       -O /etc/init.d/websockify
 
     # Replace cert info
-    sed -i s:CERT_FILE=.*:CERT_FILE=${PROXY_CERT}:g \
+    sed -i s:CERT_FILE=.*:CERT_FILE="${PROXY_CERT}":g \
       /etc/init.d/websockify
-    sed -i s:KEY_FILE=.*:KEY_FILE=${PROXY_KEY}:g \
+    sed -i s:KEY_FILE=.*:KEY_FILE="${PROXY_KEY}":g \
       /etc/init.d/websockify
   fi
-  sed -i s/WEBSOCKIFY_PORT=41337/WEBSOCKIFY_PORT=${proxy_port}/g \
+  sed -i s/WEBSOCKIFY_PORT=41337/WEBSOCKIFY_PORT="${proxy_port}"/g \
     /etc/init.d/websockify
   sed -i s:WEBSOCKIFY=.*/websockify:WEBSOCKIFY=\\\$BINDIR/websockify.py:g \
     /etc/init.d/websockify
@@ -81,7 +71,7 @@ install_proxy () {
   chkconfig websockify on
 
   # noVNC tokens script
-  wget https://raw.githubusercontent.com/abiquo/noVNC/xml-for-3.0/novnc_tokens.rb \
+  wget https://raw.githubusercontent.com/abiquo/noVNC/0.0.1/novnc_tokens.rb \
     -O /opt/websockify/novnc_tokens.rb
   chmod +x /opt/websockify/novnc_tokens.rb
 
@@ -104,29 +94,30 @@ setup_ui () {
 
   # Download websockify
   destdir=$(mktemp -d)
-  wget http://github.com/kanaka/noVNC/tarball/v0.5.1 \
-    -O $destdir/novnc-master.tar.gz
-  cd $destdir
+  wget http://github.com/kanaka/noVNC/tarball/master \
+    -O "$destdir/novnc-master.tar.gz"
+  cd "$destdir"
   tar xf novnc-master.tar.gz
   mv kanaka-noVNC-* /var/www/html/ui/lib/remoteaccess/tightvnc
 
   # Customize files
-  destdir=$(mktemp -d)
-  wget http://github.com/abiquo/noVNC/tarball/master \
-    -O $destdir/abiquo-novnc-files.tar.gz
-  cd $destdir
-  tar xf abiquo-novnc-files.tar.gz
-  cd abiquo-noVNC-*
-  mv tightvnc.html /var/www/html/ui/lib/remoteaccess/tightvnc/tightvnc.html
-  mv *.js /var/www/html/ui/lib/remoteaccess/tightvnc/include/
+  # Disable host an port inputs
+  cd /var/www/html/ui/lib/remoteaccess/tightvnc/
+  sed -i s,id=\"noVNC_host\"\ /\>,id=\"noVNC_host\"\ disabled/\>,g vnc.html
+  sed -i s,id=\"noVNC_port\"\ /\>,id=\"noVNC_port\"\ disabled/\>,g vnc.html
 
-  # Replace host and port values for proxy
-  proxy_address=$(echo $PROXY_IP | cut -d':' -f1)
-  proxy_port=$(echo $PROXY_IP | cut -d':' -f2)
-  sed -i s/host\ =.*$/host\ =\ \"${proxy_address}\"/g \
-    /var/www/html/ui/lib/remoteaccess/tightvnc/tightvnc.html
-  sed -i s/port\ =.*$/port\ =\ ${proxy_port}/g \
-    /var/www/html/ui/lib/remoteaccess/tightvnc/tightvnc.html
+  # Customize CSS to fit Abiquo
+  wget https://raw.githubusercontent.com/abiquo/noVNC/0.0.1/css.py \
+    -O /var/www/html/ui/lib/remoteaccess/tightvnc/css.py
+  cs /var/www/html/ui/lib/remoteaccess/tightvnc/
+  python css.py > /dev/null 2>&1
+
+  # Replace abiquo.min.js to generate links for noVNC
+  mv /var/www/html/ui/js/abiquo.min.js /var/www/html/ui/js/abiquo.min.js.old
+  wget https://raw.githubusercontent.com/abiquo/noVNC/0.0.1/abiquo.min.js \
+    -O /var/www/html/ui/js/abiquo.min.js
+
+  service httpd restart
 }
 
 options='wl:a:u:p:i:c:k:h'
