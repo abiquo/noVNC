@@ -42,7 +42,7 @@ install_proxy () {
   # Proxy dependencies
   echo 'Installing proxy dependencies...'
   yum -y install python-pip python-devel openssl-devel ruby rubygems \
-    ruby-devel make gcc libxml2 libxml2-devel libxslt libxslt-devel
+    ruby-devel make gcc libxml2 libxml2-devel libxslt libxslt-devel wget
   pip install numpy
   gem install --no-ri --no-rdoc mime-types -v '1.25'
   gem install --no-ri --no-rdoc rest-client -v '1.6.8'
