@@ -41,6 +41,7 @@ install_proxy () {
 
   # Proxy dependencies
   echo 'Installing proxy dependencies...'
+  yum -y install epel-release # python-pip is in epel-release repository
   yum -y install python-pip python-devel openssl-devel ruby rubygems \
     ruby-devel make gcc libxml2 libxml2-devel libxslt libxslt-devel wget
   pip install numpy
