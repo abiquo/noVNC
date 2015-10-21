@@ -82,7 +82,7 @@ install_proxy () {
   chkconfig websockify on
 
   # noVNC tokens script
-  wget https://raw.githubusercontent.com/abiquo/noVNC/xml-for-3.0/novnc_tokens.rb \
+  wget https://raw.githubusercontent.com/abiquo/noVNC/master/novnc_tokens.rb \
     -O /opt/websockify/novnc_tokens.rb
   chmod +x /opt/websockify/novnc_tokens.rb
 
