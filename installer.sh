@@ -147,6 +147,11 @@ do
     esac
 done
 
+if [ $OPTIND -eq 1 ]; then
+  usage
+  exit 1
+fi
+
 if [ "$PROXY" == true ]; then
   install_proxy $PROXY_PORT
 else
