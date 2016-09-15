@@ -1,17 +1,8 @@
 #!/usr/bin/env ruby
 
-# 82473345 - 40762279 - 45174221 - 33652054 - 12387249
-
 require 'rubygems'
 require 'trollop'
-require '/home/antxon/github/abiquo/api-ruby/lib/abiquo-api.rb'
-require 'pry-byebug'
-
-# Usage:
-# novnc_tokens2.rb ABQ_ENDPOINT USERNAME PASSWORD TOKENFILE
-#
-# Example
-# novnc_tokens2.rb http://abq38.bcn.abiquo.com/api admin xabiquo /opt/websockify/config.vnc
+require 'abiquo-api'
 
 def link(h, a)
   AbiquoAPI::Link.new(:href => h, :type => "application/vnd.abiquo.#{a}+json", :client => $client)
@@ -51,7 +42,7 @@ begin
   datacenters.each do |d|
     racks = d.link(:racks).get
     racks.each do |r|
-      vms = link("#{r.url}/deployedvms", "virtualmachines").get(:limit => 0)
+      vms = link("#{r.url}/deployedvms", "virtualmachines").get
       vms.each do |vm|
         next unless (vm.vdrpIP && vm.vdrpPort)
         conn = "#{vm.vdrpIP}:#{vm.vdrpPort}"
